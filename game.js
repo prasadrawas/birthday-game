@@ -4329,7 +4329,7 @@
   // --- Prasad Chibi Character Drawing ---
   function drawPrasad(x, y, state, animFrame) {
     // x, y = bottom-center of character
-    // Character is ~40w x 60h standing
+    // Chubby chibi style matching reference PNG
     ctx.save();
     ctx.translate(x, y);
 
@@ -4337,30 +4337,208 @@
     const isJump = state === 'jump';
 
     if (isSlide) {
-      // Rotate and shift for sliding pose
       ctx.translate(10, -12);
       ctx.rotate(Math.PI / 2.5);
     }
 
     const bounce = (!isSlide && !isJump) ? Math.sin(animFrame * Math.PI / 2) * 2 : 0;
-    const legSwing = (!isSlide && !isJump) ? Math.sin(animFrame * Math.PI / 2) * 0.3 : 0;
+    const legSwing = (!isSlide && !isJump) ? Math.sin(animFrame * Math.PI / 2) * 0.25 : 0;
 
-    // --- Legs (behind body) ---
-    drawLegs(legSwing, bounce);
+    ctx.translate(0, -bounce);
 
-    // --- Body / Shirt ---
-    drawBody(bounce);
+    // --- Tiny legs/feet (chibi = small legs) ---
+    ctx.save();
+    // Left foot
+    ctx.save();
+    ctx.translate(-7, -2);
+    ctx.rotate(legSwing);
+    ctx.fillStyle = '#2a2a3a';
+    ctx.beginPath(); roundRect(ctx, -4, -3, 8, 8, 3); ctx.fill();
+    ctx.restore();
+    // Right foot
+    ctx.save();
+    ctx.translate(7, -2);
+    ctx.rotate(-legSwing);
+    ctx.fillStyle = '#2a2a3a';
+    ctx.beginPath(); roundRect(ctx, -4, -3, 8, 8, 3); ctx.fill();
+    ctx.restore();
+    ctx.restore();
 
-    // --- Arms ---
-    drawArms(animFrame, bounce, isSlide, isJump);
+    // --- Chubby body / Navy blue shirt ---
+    ctx.fillStyle = '#1a2744';
+    ctx.beginPath();
+    ctx.ellipse(0, -22, 20, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#111a30';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(0, -22, 20, 20, 0, 0, Math.PI * 2);
+    ctx.stroke();
 
-    // --- Head ---
-    drawHead(bounce, animFrame);
+    // Shirt pocket (right side)
+    ctx.strokeStyle = '#2a3a5a';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); roundRect(ctx, 5, -26, 7, 6, 1); ctx.stroke();
+
+    // Shirt collar
+    ctx.strokeStyle = '#2a3a5a';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.moveTo(-6, -36);
+    ctx.lineTo(0, -30);
+    ctx.lineTo(6, -36);
+    ctx.stroke();
+
+    // --- Arms (chubby, short) ---
+    var armSwing = (!isSlide && !isJump) ? Math.sin(animFrame * Math.PI / 2) * 0.3 : 0;
+
+    // Left arm
+    ctx.save();
+    ctx.translate(-18, -26);
+    ctx.rotate(-0.3 + armSwing);
+    ctx.fillStyle = '#1a2744';
+    ctx.beginPath(); roundRect(ctx, -5, 0, 10, 12, 4); ctx.fill();
+    ctx.strokeStyle = '#111a30';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); roundRect(ctx, -5, 0, 10, 12, 4); ctx.stroke();
+    // Hand
+    ctx.fillStyle = '#c68642';
+    ctx.beginPath(); ctx.arc(0, 14, 4, 0, Math.PI * 2); ctx.fill();
+    // Bracelet
+    ctx.fillStyle = '#c8a050';
+    ctx.fillRect(-4, 10, 8, 3);
+    ctx.strokeStyle = '#a08030';
+    ctx.lineWidth = 0.5;
+    ctx.strokeRect(-4, 10, 8, 3);
+    ctx.restore();
+
+    // Right arm
+    ctx.save();
+    ctx.translate(18, -26);
+    ctx.rotate(0.3 - armSwing);
+    ctx.fillStyle = '#1a2744';
+    ctx.beginPath(); roundRect(ctx, -5, 0, 10, 12, 4); ctx.fill();
+    ctx.strokeStyle = '#111a30';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath(); roundRect(ctx, -5, 0, 10, 12, 4); ctx.stroke();
+    ctx.fillStyle = '#c68642';
+    ctx.beginPath(); ctx.arc(0, 14, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // --- Big head (chibi proportions — head ~= body) ---
+    var headY = -42;
+
+    // Hair back layer
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.ellipse(0, headY + 2, 20, 22, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Head/face
+    ctx.fillStyle = '#c68642';
+    ctx.beginPath();
+    ctx.ellipse(0, headY + 2, 17, 18, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(0, headY + 2, 17, 18, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Hair top — swooped up style
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.moveTo(-17, headY);
+    ctx.quadraticCurveTo(-18, headY - 16, -6, headY - 18);
+    ctx.quadraticCurveTo(4, headY - 22, 10, headY - 16);
+    ctx.quadraticCurveTo(18, headY - 10, 17, headY);
+    ctx.quadraticCurveTo(12, headY - 6, 0, headY - 8);
+    ctx.quadraticCurveTo(-10, headY - 5, -17, headY);
+    ctx.closePath();
+    ctx.fill();
+
+    // Hair sides
+    ctx.fillRect(-17, headY - 2, 4, 10);
+    ctx.fillRect(13, headY - 2, 4, 10);
+
+    // Hair shine
+    ctx.fillStyle = 'rgba(255,255,255,0.08)';
+    ctx.beginPath();
+    ctx.ellipse(-3, headY - 14, 5, 3, -0.3, 0, Math.PI * 2);
+    ctx.fill();
+
+    // --- HUGE eyes (matching reference — very large white circles) ---
+    // Left eye
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(-7, headY + 2, 8, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(-7, headY + 2, 8, 9, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Right eye
+    ctx.fillStyle = '#fff';
+    ctx.beginPath();
+    ctx.ellipse(7, headY + 2, 8, 9, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(7, headY + 2, 8, 9, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Pupils (big, black)
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(-6, headY + 3, 4.5, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(8, headY + 3, 4.5, 0, Math.PI * 2); ctx.fill();
+
+    // Eye shine (top-left sparkle)
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-8, headY, 2, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(6, headY, 2, 0, Math.PI * 2); ctx.fill();
+    // Smaller secondary shine
+    ctx.beginPath(); ctx.arc(-4, headY + 5, 1, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(10, headY + 5, 1, 0, Math.PI * 2); ctx.fill();
+
+    // --- Beard/goatee (dark, visible) ---
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.moveTo(-10, headY + 10);
+    ctx.quadraticCurveTo(-12, headY + 16, -5, headY + 19);
+    ctx.quadraticCurveTo(0, headY + 21, 5, headY + 19);
+    ctx.quadraticCurveTo(12, headY + 16, 10, headY + 10);
+    ctx.quadraticCurveTo(6, headY + 12, 0, headY + 12);
+    ctx.quadraticCurveTo(-6, headY + 12, -10, headY + 10);
+    ctx.closePath();
+    ctx.fill();
+
+    // Mustache
+    ctx.beginPath();
+    ctx.moveTo(-8, headY + 10);
+    ctx.quadraticCurveTo(-4, headY + 8, 0, headY + 10);
+    ctx.quadraticCurveTo(4, headY + 8, 8, headY + 10);
+    ctx.quadraticCurveTo(4, headY + 11, 0, headY + 11);
+    ctx.quadraticCurveTo(-4, headY + 11, -8, headY + 10);
+    ctx.fill();
+
+    // Nose (tiny)
+    ctx.fillStyle = '#b0723a';
+    ctx.beginPath(); ctx.ellipse(0, headY + 9, 2, 1.5, 0, 0, Math.PI); ctx.fill();
+
+    // Mouth (small smile under beard)
+    ctx.strokeStyle = '#333';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.arc(0, headY + 15, 3, 0.2, Math.PI - 0.2);
+    ctx.stroke();
 
     ctx.restore();
   }
 
-  function drawLegs(legSwing, bounce) {
+  function _old_drawLegs(legSwing, bounce) {
     ctx.save();
     ctx.translate(0, -bounce);
 
@@ -5309,123 +5487,170 @@
   }
 
   // Arya silhouette for title screen
+  // Arya — chubby chibi matching reference PNG: silver dress, long black hair, big eyes
   function drawAryaSilhouette(x, groundY) {
     ctx.save();
     ctx.translate(x, groundY);
 
-    // Dress
-    ctx.fillStyle = '#cc3366';
+    // --- Hair back layer (long, flowing past body) ---
+    ctx.fillStyle = '#1a1a1a';
+    // Left hair flow
     ctx.beginPath();
-    ctx.moveTo(-12, -4);
-    ctx.lineTo(-18, 0);
-    ctx.lineTo(18, 0);
-    ctx.lineTo(12, -4);
-    ctx.lineTo(10, -20);
-    ctx.lineTo(-10, -20);
+    ctx.moveTo(-14, -48);
+    ctx.quadraticCurveTo(-20, -30, -18, -10);
+    ctx.quadraticCurveTo(-16, 0, -12, 2);
+    ctx.lineTo(-10, -10);
+    ctx.quadraticCurveTo(-14, -30, -14, -48);
+    ctx.fill();
+    // Right hair flow
+    ctx.beginPath();
+    ctx.moveTo(14, -48);
+    ctx.quadraticCurveTo(20, -30, 18, -10);
+    ctx.quadraticCurveTo(16, 0, 12, 2);
+    ctx.lineTo(10, -10);
+    ctx.quadraticCurveTo(14, -30, 14, -48);
+    ctx.fill();
+
+    // --- Silver/grey flowing dress (chubby bell shape) ---
+    ctx.fillStyle = '#b8b8c8';
+    ctx.beginPath();
+    ctx.moveTo(-12, -25);
+    ctx.quadraticCurveTo(-22, -10, -20, 0);
+    ctx.lineTo(20, 0);
+    ctx.quadraticCurveTo(22, -10, 12, -25);
     ctx.closePath();
     ctx.fill();
+    // Dress folds
+    ctx.strokeStyle = '#9a9ab0';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(-6, -20); ctx.quadraticCurveTo(-8, -10, -10, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(2, -22); ctx.quadraticCurveTo(0, -10, -2, 0); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(8, -20); ctx.quadraticCurveTo(10, -10, 12, 0); ctx.stroke();
 
-    // Body / torso
-    ctx.fillStyle = '#cc3366';
+    // Upper dress / bodice
+    ctx.fillStyle = '#b8b8c8';
     ctx.beginPath();
-    roundRect(ctx, -9, -30, 18, 14, 3);
+    ctx.ellipse(0, -28, 14, 10, 0, 0, Math.PI * 2);
     ctx.fill();
+    ctx.strokeStyle = '#9a9ab0';
+    ctx.lineWidth = 1.5;
+    ctx.beginPath();
+    ctx.ellipse(0, -28, 14, 10, 0, 0, Math.PI * 2);
+    ctx.stroke();
 
-    // Head
+    // Neckline
     ctx.fillStyle = '#c68642';
     ctx.beginPath();
-    ctx.ellipse(0, -40, 12, 13, 0, 0, Math.PI * 2);
+    ctx.ellipse(0, -34, 5, 3, 0, 0, Math.PI);
     ctx.fill();
+
+    // --- Arms (chubby, short) ---
+    // Left arm
+    ctx.fillStyle = '#c68642';
+    ctx.save();
+    ctx.translate(-14, -30);
+    ctx.rotate(-0.4);
+    ctx.beginPath(); ctx.ellipse(0, 6, 5, 8, 0, 0, Math.PI * 2); ctx.fill();
+    // Bracelet
+    ctx.fillStyle = '#c8a050';
+    ctx.fillRect(-4, 10, 8, 3);
+    // Hand
+    ctx.fillStyle = '#c68642';
+    ctx.beginPath(); ctx.arc(0, 15, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // Right arm
+    ctx.fillStyle = '#c68642';
+    ctx.save();
+    ctx.translate(14, -30);
+    ctx.rotate(0.4);
+    ctx.beginPath(); ctx.ellipse(0, 6, 5, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.fillStyle = '#c68642';
+    ctx.beginPath(); ctx.arc(0, 15, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+
+    // --- Big head ---
+    var headY = -44;
+
+    // Hair top
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.ellipse(0, headY, 19, 20, 0, 0, Math.PI * 2);
+    ctx.fill();
+
+    // Face
+    ctx.fillStyle = '#c68642';
+    ctx.beginPath();
+    ctx.ellipse(0, headY + 2, 15, 16, 0, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.ellipse(0, headY + 2, 15, 16, 0, 0, Math.PI * 2);
+    ctx.stroke();
+
+    // Hair framing face
+    ctx.fillStyle = '#1a1a1a';
+    ctx.beginPath();
+    ctx.moveTo(-15, headY);
+    ctx.quadraticCurveTo(-16, headY - 14, -4, headY - 16);
+    ctx.quadraticCurveTo(6, headY - 18, 15, headY - 10);
+    ctx.quadraticCurveTo(17, headY, 15, headY + 5);
+    ctx.lineTo(13, headY);
+    ctx.quadraticCurveTo(8, headY - 8, 0, headY - 10);
+    ctx.quadraticCurveTo(-8, headY - 8, -13, headY);
+    ctx.lineTo(-15, headY + 5);
+    ctx.closePath();
+    ctx.fill();
+    // Side hair strands
+    ctx.fillRect(-16, headY - 2, 4, 16);
+    ctx.fillRect(12, headY - 2, 4, 16);
+
+    // --- HUGE eyes (matching reference) ---
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.ellipse(-6, headY + 2, 7, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(6, headY + 2, 7, 8, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.strokeStyle = '#222';
+    ctx.lineWidth = 2;
+    ctx.beginPath(); ctx.ellipse(-6, headY + 2, 7, 8, 0, 0, Math.PI * 2); ctx.stroke();
+    ctx.beginPath(); ctx.ellipse(6, headY + 2, 7, 8, 0, 0, Math.PI * 2); ctx.stroke();
+
+    // Pupils
+    ctx.fillStyle = '#000';
+    ctx.beginPath(); ctx.arc(-5, headY + 3, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(7, headY + 3, 4, 0, Math.PI * 2); ctx.fill();
+
+    // Eye shine
+    ctx.fillStyle = '#fff';
+    ctx.beginPath(); ctx.arc(-7, headY, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(5, headY, 1.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(-3, headY + 5, 0.8, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(9, headY + 5, 0.8, 0, Math.PI * 2); ctx.fill();
+
+    // Nose (tiny)
+    ctx.fillStyle = '#b0723a';
+    ctx.beginPath(); ctx.ellipse(0, headY + 8, 1.5, 1, 0, 0, Math.PI); ctx.fill();
+
+    // Cute smile
     ctx.strokeStyle = '#8b5e3c';
     ctx.lineWidth = 1.5;
     ctx.beginPath();
-    ctx.ellipse(0, -40, 12, 13, 0, 0, Math.PI * 2);
+    ctx.arc(0, headY + 11, 4, 0.1, Math.PI - 0.1);
     ctx.stroke();
-
-    // Hair — long flowing
-    ctx.fillStyle = '#1a1a2e';
-    ctx.beginPath();
-    ctx.ellipse(0, -48, 13, 10, 0, Math.PI, Math.PI * 2);
-    ctx.fill();
-    // Side hair
-    ctx.fillRect(-13, -45, 4, 30);
-    ctx.fillRect(9, -45, 4, 30);
-    // Hair back
-    ctx.beginPath();
-    ctx.moveTo(-13, -40);
-    ctx.quadraticCurveTo(-15, -20, -10, -10);
-    ctx.lineTo(-13, -40);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.moveTo(13, -40);
-    ctx.quadraticCurveTo(15, -20, 10, -10);
-    ctx.lineTo(13, -40);
-    ctx.fill();
-
-    // Eyes (looking toward Prasad — left)
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.ellipse(-4, -41, 4, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(4, -41, 4, 5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.fillStyle = '#2a1a0a';
-    ctx.beginPath();
-    ctx.ellipse(-5, -40, 2.5, 3.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(3, -40, 2.5, 3.5, 0, 0, Math.PI * 2);
-    ctx.fill();
-    // Sparkle
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.arc(-6, -42, 1.2, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.arc(2, -42, 1.2, 0, Math.PI * 2);
-    ctx.fill();
 
     // Blush
     ctx.fillStyle = 'rgba(255,100,120,0.25)';
-    ctx.beginPath();
-    ctx.ellipse(-7, -37, 3, 2, 0, 0, Math.PI * 2);
-    ctx.fill();
-    ctx.beginPath();
-    ctx.ellipse(7, -37, 3, 2, 0, 0, Math.PI * 2);
-    ctx.fill();
+    ctx.beginPath(); ctx.ellipse(-9, headY + 7, 3.5, 2, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(9, headY + 7, 3.5, 2, 0, 0, Math.PI * 2); ctx.fill();
 
-    // Smile
-    ctx.strokeStyle = '#8b5e3c';
-    ctx.lineWidth = 1.5;
-    ctx.beginPath();
-    ctx.arc(0, -36, 3, 0.1, Math.PI - 0.1);
-    ctx.stroke();
+    // Necklace dot
+    ctx.fillStyle = '#c8a050';
+    ctx.beginPath(); ctx.arc(0, headY + 16, 1.5, 0, Math.PI * 2); ctx.fill();
 
-    // Bindi
-    ctx.fillStyle = '#ff3333';
-    ctx.beginPath();
-    ctx.arc(0, -48, 1.5, 0, Math.PI * 2);
-    ctx.fill();
-
-    // Dupatta / scarf accent
-    ctx.fillStyle = 'rgba(255,150,200,0.5)';
-    ctx.beginPath();
-    ctx.moveTo(10, -25);
-    ctx.quadraticCurveTo(20, -15, 15, 0);
-    ctx.lineTo(12, -4);
-    ctx.lineTo(10, -20);
-    ctx.closePath();
-    ctx.fill();
-
-    // Shoes
-    ctx.fillStyle = '#aa2244';
-    ctx.beginPath();
-    roundRect(ctx, -8, -2, 7, 4, 1);
-    ctx.fill();
-    ctx.beginPath();
-    roundRect(ctx, 2, -2, 7, 4, 1);
-    ctx.fill();
+    // Tiny feet
+    ctx.fillStyle = '#c68642';
+    ctx.beginPath(); roundRect(ctx, -8, -3, 7, 4, 2); ctx.fill();
+    ctx.beginPath(); roundRect(ctx, 2, -3, 7, 4, 2); ctx.fill();
 
     ctx.restore();
   }
