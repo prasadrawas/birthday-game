@@ -365,6 +365,19 @@
     // Don't act during hit stun
     if (p.state === 'hit') return;
 
+    // Villain fight — top priority
+    if (game.villainActive && game.villainPhase === 2) {
+      // Keep jumping to stomp the villain
+      if (p.jumpsLeft > 0) {
+        input.jumpJustPressed = true;
+      }
+      return;
+    }
+    // During villain convo/approach/post-defeat, do nothing
+    if (game.villainActive) {
+      return;
+    }
+
     // Scale look-ahead with speed
     const lookAhead = 80 + game.speed * 18;
     let nearestGround = null;
@@ -390,14 +403,12 @@
       }
     }
 
-    // Reaction zone — tighter = more precise timing
+    // Reaction zone
     const jumpZone = 40 + game.speed * 10;
     const slideZone = 40 + game.speed * 12;
 
-    // Priority: slide for air obstacles, jump for ground ones
-    // If both are close, prioritize whichever is nearer
+    // Slide for air obstacles, jump for ground ones
     if (nearestAir && nearestAirDist < slideZone) {
-      // Need to slide — only if grounded and not already sliding
       if (p.isGrounded && p.state !== 'slide' && !p.vy) {
         input.slideJustPressed = true;
         input.slidePressed = true;
@@ -406,23 +417,10 @@
     }
 
     if (nearestGround && nearestGroundDist < jumpZone) {
-      // Need to jump — only if we can
       if (p.state !== 'slide' && p.jumpsLeft > 0) {
         input.jumpJustPressed = true;
         return;
       }
-    }
-
-    // Villain fight — keep jumping to stomp
-    if (game.villainActive && game.villainPhase === 2) {
-      if (p.jumpsLeft > 0) {
-        input.jumpJustPressed = true;
-      }
-      return;
-    }
-    // During villain convo or approach, do nothing
-    if (game.villainActive && game.villainPhase < 2) {
-      return;
     }
 
     // Collect high items by jumping
@@ -599,6 +597,24 @@
       ctx.font = 'bold 16px "Segoe UI", sans-serif';
       ctx.fillText("It's Arya's Birthday!", W / 2, 60);
     }
+
+    // Skip button (top-right)
+    var skW = 80, skH = 28;
+    var skX = W - skW - 15, skY = 12;
+    ctx.fillStyle = 'rgba(255,255,255,0.12)';
+    ctx.beginPath(); roundRect(ctx, skX, skY, skW, skH, 6); ctx.fill();
+    ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+    ctx.lineWidth = 1;
+    ctx.beginPath(); roundRect(ctx, skX, skY, skW, skH, 6); ctx.stroke();
+    ctx.fillStyle = '#aaa';
+    ctx.font = '13px "Segoe UI", sans-serif';
+    ctx.textAlign = 'center';
+    ctx.fillText('SKIP ▶▶', skX + skW / 2, skY + 19);
+    menuButtons.push({ x: skX, y: skY, w: skW, h: skH, action: skipIntro });
+  }
+
+  function skipIntro() {
+    beginGameplay();
   }
 
   // Prasad's Mom — home saree, concerned look, hands on hips
@@ -6013,6 +6029,28 @@
     }
 
     // --- Play Again button (after phase 4 wait) ---
+    // Skip button during cutscene (before play again shows)
+    if (!cutscene.showPlayAgain) {
+      var skW3 = 80, skH3 = 28;
+      var skX3 = W - skW3 - 15, skY3 = 12;
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.beginPath(); roundRect(ctx, skX3, skY3, skW3, skH3, 6); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); roundRect(ctx, skX3, skY3, skW3, skH3, 6); ctx.stroke();
+      ctx.fillStyle = '#aaa';
+      ctx.font = '13px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('SKIP ▶▶', skX3 + skW3 / 2, skY3 + 19);
+      menuButtons.push({ x: skX3, y: skY3, w: skW3, h: skH3, action: function () {
+        cutscene.phase = 4;
+        cutscene.timer = 4;
+        cutscene.showPlayAgain = true;
+        cutscene.prasadX = W / 2 - 8;
+        cutscene.aryaX = W / 2 + 8;
+      }});
+    }
+
     if (cutscene.showPlayAgain) {
       const btnW = 180;
       const btnH = 45;
@@ -6464,6 +6502,35 @@
         drawSpeechBubble(villainBubbleX, GROUND_Y - 100, cd2.text, 'right');
       }
       ctx.globalAlpha = 1;
+    }
+
+    // Skip button during conversations
+    if (game.villainPhase === 1 || game.villainPhase === 3) {
+      var skW2 = 80, skH2 = 28;
+      var skX2 = W - skW2 - 15, skY2 = 12;
+      ctx.fillStyle = 'rgba(255,255,255,0.12)';
+      ctx.beginPath(); roundRect(ctx, skX2, skY2, skW2, skH2, 6); ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+      ctx.lineWidth = 1;
+      ctx.beginPath(); roundRect(ctx, skX2, skY2, skW2, skH2, 6); ctx.stroke();
+      ctx.fillStyle = '#aaa';
+      ctx.font = '13px "Segoe UI", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText('SKIP ▶▶', skX2 + skW2 / 2, skY2 + 19);
+      menuButtons.push({ x: skX2, y: skY2, w: skW2, h: skH2, action: skipVillainConvo });
+    }
+  }
+
+  function skipVillainConvo() {
+    var v = villains[game.villainId];
+    if (game.villainPhase === 1) {
+      // Skip to fight
+      game.villainPhase = 2;
+      game.villainAttackTimer = 1.5;
+    } else if (game.villainPhase === 3) {
+      // Skip to walk away
+      game.villainPhase = 4;
+      game.villainDefeatedWalkTimer = 0;
     }
   }
 
