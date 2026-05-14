@@ -8,9 +8,30 @@
   // --- Canvas Setup ---
   const canvas = document.getElementById('gameCanvas');
   const ctx = canvas.getContext('2d');
-  const W = canvas.width;   // 900
-  const H = canvas.height;  // 506
+  // Design resolution — all game logic uses these coordinates
+  const W = 900;
+  const H = 506;
   const GROUND_Y = H - 60;  // ground surface y-coordinate
+
+  // Resize canvas buffer to fill window, scale context to design resolution
+  function resizeCanvas() {
+    var dpr = window.devicePixelRatio || 1;
+    var winW = window.innerWidth;
+    var winH = window.innerHeight;
+    canvas.width = winW * dpr;
+    canvas.height = winH * dpr;
+    canvas.style.width = winW + 'px';
+    canvas.style.height = winH + 'px';
+  }
+  resizeCanvas();
+  window.addEventListener('resize', resizeCanvas);
+
+  // Apply scaling before each render so 900x506 coords fill the screen
+  function applyCanvasScale() {
+    var scaleX = canvas.width / W;
+    var scaleY = canvas.height / H;
+    ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
+  }
 
   // --- Game States ---
   const State = {
@@ -2477,6 +2498,7 @@
 
   // --- Render ---
   function render() {
+    applyCanvasScale();
     ctx.clearRect(0, 0, W, H);
     menuButtons = []; // reset each frame
 
