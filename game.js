@@ -13,24 +13,34 @@
   const H = 506;
   const GROUND_Y = H - 60;  // ground surface y-coordinate
 
-  // Resize canvas buffer to fill window, scale context to design resolution
+  // Resize canvas to fill window with letterboxing (black bars)
+  let canvasOffsetX = 0, canvasOffsetY = 0, canvasScale = 1;
+
   function resizeCanvas() {
     var dpr = window.devicePixelRatio || 1;
     var winW = window.innerWidth;
     var winH = window.innerHeight;
-    canvas.width = winW * dpr;
-    canvas.height = winH * dpr;
-    canvas.style.width = winW + 'px';
-    canvas.style.height = winH + 'px';
+    // Fit 900x506 into window, preserving aspect ratio
+    canvasScale = Math.min(winW / W, winH / H);
+    var scaledW = W * canvasScale;
+    var scaledH = H * canvasScale;
+    canvasOffsetX = (winW - scaledW) / 2;
+    canvasOffsetY = (winH - scaledH) / 2;
+    canvas.width = Math.round(scaledW * dpr);
+    canvas.height = Math.round(scaledH * dpr);
+    canvas.style.width = Math.round(scaledW) + 'px';
+    canvas.style.height = Math.round(scaledH) + 'px';
+    canvas.style.left = Math.round(canvasOffsetX) + 'px';
+    canvas.style.top = Math.round(canvasOffsetY) + 'px';
   }
   resizeCanvas();
   window.addEventListener('resize', resizeCanvas);
 
-  // Apply scaling before each render so 900x506 coords fill the screen
+  // Apply scaling before each render so 900x506 coords map to canvas
   function applyCanvasScale() {
-    var scaleX = canvas.width / W;
-    var scaleY = canvas.height / H;
-    ctx.setTransform(scaleX, 0, 0, scaleY, 0, 0);
+    var dpr = window.devicePixelRatio || 1;
+    var s = canvasScale * dpr;
+    ctx.setTransform(s, 0, 0, s, 0, 0);
   }
 
   // --- Game States ---
