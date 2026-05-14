@@ -1,5 +1,5 @@
 // ============================================================
-// Run to Midnight Kiss — game.js
+// Wish Birthday Arya — game.js
 // ============================================================
 
 (function () {
@@ -5407,13 +5407,13 @@
     ctx.fillStyle = '#ff69b4';
     ctx.font = 'bold 44px "Segoe UI", sans-serif';
     ctx.textAlign = 'center';
-    ctx.fillText('Run to Midnight Kiss', W / 2, 120);
+    ctx.fillText('Wish Birthday Arya', W / 2, 120);
     ctx.shadowBlur = 0;
 
     // Title outline
     ctx.strokeStyle = 'rgba(255,255,255,0.3)';
     ctx.lineWidth = 1;
-    ctx.strokeText('Run to Midnight Kiss', W / 2, 120);
+    ctx.strokeText('Wish Birthday Arya', W / 2, 120);
 
     // Subtitle
     ctx.fillStyle = '#ffb6c1';
